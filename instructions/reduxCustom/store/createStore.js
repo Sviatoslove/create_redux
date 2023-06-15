@@ -1,4 +1,4 @@
-export function createStore(reducer, initialState) {
+function createStore(reducer, initialState) {
   let state = initialState;
   let listeners = [];
 
@@ -20,3 +20,5 @@ export function createStore(reducer, initialState) {
 
   return { getState, dispatch, subscribe };
 }
+
+export default createStore;

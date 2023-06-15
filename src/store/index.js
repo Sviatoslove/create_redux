@@ -1,4 +1,4 @@
-import { createStore } from './createStore';
-import { taskReducer } from './taskReducer';
+import createStore from './store';
+import taskReducer, { titleChanged, taskRemove } from './task';
 
-export { createStore, taskReducer };
+export { createStore, taskReducer, titleChanged, taskRemove };

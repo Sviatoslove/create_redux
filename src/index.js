@@ -1,50 +1,53 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 import ReactDOM from 'react-dom/client';
-import { createStore, taskReducer } from './store';
-import * as actions from './store/actions';
+import { createStore, taskRemove, titleChanged } from './store';
+import { completeTask, getTasks } from './store/task';
 
-const initialState = [
-  { id: 1, title: 'Task 1', completed: false },
-  { id: 2, title: 'Task 2', completed: false },
-];
+export const store = createStore();
 
-export const store = createStore(taskReducer, initialState);
-
-const App = () => {
-  const [state, getState] = useState(store.getState());
+const App = (params) => {
+  const state = useSelector((store) => store.entities);
+  const isLoading = useSelector((store) => store.isLoading);
+  const error = useSelector((store) => store.errors.entities);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    store.subscribe(() => {
-      getState(store.getState());
-    });
+    dispatch(getTasks());
   }, []);
 
-  const completeTask = (taskId) => {
-    store.dispatch(actions.taskCompleted(taskId));
-  };
-
   const changeTitle = (taskId) => {
-    store.dispatch(actions.titleChanged(taskId));
+    dispatch(titleChanged(taskId));
   };
 
   const deleteTask = (taskId) => {
-    store.dispatch(actions.taskDeleted(taskId));
+    dispatch(taskRemove(taskId));
   };
+
+  if (error) {
+    return <p>{error}</p>;
+  }
 
   return (
     <>
       <h1>App</h1>
       <ul>
-        {state.map((el) => (
-          <li key={el.id}>
-            <p>Title: {el.title}</p>
-            <p>completed: {`${el.completed}`}</p>
-            <button onClick={() => completeTask(el.id)}>Complete</button>
-            <button onClick={() => changeTitle(el.id)}>Change title</button>
-            <button onClick={() => deleteTask(el.id)}>Delete</button>
-            <hr></hr>
-          </li>
-        ))}
+        {isLoading ? (
+          <h1>Loading...</h1>
+        ) : (
+          state.map((el) => (
+            <li key={el.id}>
+              <p>Title: {el.title}</p>
+              <p>completed: {`${el.completed}`}</p>
+              <button onClick={() => dispatch(completeTask(el.id))}>
+                Complete
+              </button>
+              <button onClick={() => changeTitle(el.id)}>Change title</button>
+              <button onClick={() => deleteTask(el.id)}>Delete</button>
+              <hr></hr>
+            </li>
+          ))
+        )}
       </ul>
     </>
   );
@@ -53,6 +56,8 @@ const App = () => {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>
 );
