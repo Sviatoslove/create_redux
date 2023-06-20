@@ -14,13 +14,12 @@ const errorSlice = createSlice({
 
 const { reducer: errorReducer, actions } = errorSlice;
 
-console.log('errorReducer:', errorReducer);
-console.log('errorSlice:', errorSlice);
-
 const { set } = actions;
 
 export const setError = (message) => (dispatch) => {
   dispatch(set(message));
 };
+
+export const getError = () => (store) => store.errors.entities[0];
 
 export default errorReducer;

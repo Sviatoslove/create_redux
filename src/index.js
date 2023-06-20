@@ -1,28 +1,29 @@
 import React, { useEffect } from 'react';
-import { Provider, useDispatch, useSelector } from 'react-redux';
 import ReactDOM from 'react-dom/client';
-import { createStore, taskRemove, titleChanged } from './store';
-import { completeTask, getTasks } from './store/task';
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import {
+  changeTitle,
+  completeTask,
+  createTask,
+  deleteTask,
+  getTasks,
+  getTasksLoadingStatus,
+  loadTasks,
+} from './store/task';
+import createStore from './store/store';
+import { getError } from './store/errors';
 
 export const store = createStore();
 
 const App = (params) => {
-  const state = useSelector((store) => store.entities);
-  const isLoading = useSelector((store) => store.isLoading);
-  const error = useSelector((store) => store.errors.entities);
+  const state = useSelector(getTasks());
+  const isLoading = useSelector(getTasksLoadingStatus());
+  const error = useSelector(getError());
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getTasks());
+    dispatch(loadTasks());
   }, []);
-
-  const changeTitle = (taskId) => {
-    dispatch(titleChanged(taskId));
-  };
-
-  const deleteTask = (taskId) => {
-    dispatch(taskRemove(taskId));
-  };
 
   if (error) {
     return <p>{error}</p>;
@@ -31,6 +32,10 @@ const App = (params) => {
   return (
     <>
       <h1>App</h1>
+      <button onClick={() => dispatch(createTask())}>
+        Добавить рандомную задачу
+      </button>
+      <hr></hr>
       <ul>
         {isLoading ? (
           <h1>Loading...</h1>
@@ -42,8 +47,12 @@ const App = (params) => {
               <button onClick={() => dispatch(completeTask(el.id))}>
                 Complete
               </button>
-              <button onClick={() => changeTitle(el.id)}>Change title</button>
-              <button onClick={() => deleteTask(el.id)}>Delete</button>
+              <button onClick={() => dispatch(changeTitle(el.id))}>
+                Change title
+              </button>
+              <button onClick={() => dispatch(deleteTask(el.id))}>
+                Delete
+              </button>
               <hr></hr>
             </li>
           ))

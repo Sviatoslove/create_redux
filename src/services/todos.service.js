@@ -1,4 +1,5 @@
 import httpService from './http.service';
+import { generateTitle } from '../utils/generateTitle';
 
 const todosEndpoint = 'todos/';
 
@@ -11,6 +12,10 @@ const todosService = {
       },
     });
     return data;
+  },
+  create: async () => {
+    const { data } = await httpService.post(todosEndpoint);
+    return { ...data, title: generateTitle.getTitle(), completed: false };
   },
 };
 
